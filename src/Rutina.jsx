@@ -53,10 +53,10 @@ const initialData = {
     {
       id: "pull-curl-recta",
       name: "Curl biceps de peu barra recta",
-      series: "4 x 12",
+      series: "5 x 12",
     },
-    { id: "pull-curl-aranya", name: "Curl biceps aranya", series: "5 x 12" },
-    { id: "pull-crunchs", name: "Crunchs bicicleta", series: "4 x 12" },
+    { id: "pull-curl-aranya", name: "Curl biceps aranya", series: "4 x 12" },
+    { id: "pull-crunchs", name: "Crunchs bicicleta", series: "3 x 12" },
     { id: "pull-planxa", name: "Planxa", series: "3 x 12" },
   ],
   LEG: [
