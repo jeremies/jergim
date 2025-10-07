@@ -89,7 +89,7 @@ const clearStorage = () =>
 
 export default function RutinaPushPullLeg() {
   const [filter, setFilter] = useState(
-    () => localStorage.getItem(STORAGE_PREFIX + "selected_filter") || "all"
+    () => localStorage.getItem(STORAGE_PREFIX + "selected_filter") || "push"
   );
   const [values, setValues] = useState(() => {
     const all = {};
@@ -111,17 +111,6 @@ export default function RutinaPushPullLeg() {
   const handleChange = (id, field, val) => {
     setValues((prev) => ({ ...prev, [id]: { ...prev[id], [field]: val } }));
     saveValue(id, field, val);
-  };
-
-  const clearAll = () => {
-    if (!confirm("Vols esborrar tots els valors guardats?")) return;
-    clearStorage();
-    const empty = {};
-    Object.keys(initialData).forEach((sec) => {
-      initialData[sec].forEach((ex) => (empty[ex.id] = { eff: "", warm: "" }));
-    });
-    setValues(empty);
-    setFilter("all");
   };
 
   const Section = ({ name }) => (
@@ -173,7 +162,7 @@ export default function RutinaPushPullLeg() {
       </header>
 
       <div className="flex flex-wrap justify-center gap-3 mb-6">
-        {["all", "PUSH", "PULL", "LEG"].map((v) => (
+        {["PUSH", "PULL", "LEG"].map((v) => (
           <label
             key={v}
             className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm cursor-pointer ${
@@ -193,18 +182,9 @@ export default function RutinaPushPullLeg() {
         ))}
       </div>
 
-      {(filter === "all" || filter === "PUSH") && <Section name="PUSH" />}
-      {(filter === "all" || filter === "PULL") && <Section name="PULL" />}
-      {(filter === "all" || filter === "LEG") && <Section name="LEG" />}
-
-      <footer className="mt-6 flex justify-center">
-        <button
-          onClick={clearAll}
-          className="px-4 py-2 bg-slate-700 hover:bg-red-600 rounded-lg text-sm font-medium"
-        >
-          Esborrar valors
-        </button>
-      </footer>
+      {filter === "PUSH" && <Section name="PUSH" />}
+      {filter === "PULL" && <Section name="PULL" />}
+      {filter === "LEG" && <Section name="LEG" />}
     </main>
   );
 }
