@@ -131,7 +131,7 @@ export default function RutinaPushPullLeg() {
                 placeholder="Efectiu (kg)"
                 className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
                 value={values[ex.id]?.eff || ""}
-                onBlur={(e) => handleChange(ex.id, "eff", e.target.value)}
+                onChange={(e) => handleChange(ex.id, "eff", e.target.value)}
               />
               <input
                 type="number"
@@ -139,7 +139,7 @@ export default function RutinaPushPullLeg() {
                 placeholder="Aprox. (kg)"
                 className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
                 value={values[ex.id]?.warm || ""}
-                onBlur={(e) => handleChange(ex.id, "warm", e.target.value)}
+                onChange={(e) => handleChange(ex.id, "warm", e.target.value)}
               />
             </div>
           </div>
