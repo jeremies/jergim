@@ -82,10 +82,6 @@ const getSaved = (id, field) =>
   localStorage.getItem(STORAGE_PREFIX + id + "_" + field) || "";
 const saveValue = (id, field, val) =>
   localStorage.setItem(STORAGE_PREFIX + id + "_" + field, val);
-const clearStorage = () =>
-  Object.keys(localStorage).forEach(
-    (k) => k.startsWith(STORAGE_PREFIX) && localStorage.removeItem(k)
-  );
 
 export default function RutinaPushPullLeg() {
   const [filter, setFilter] = useState(
@@ -135,7 +131,7 @@ export default function RutinaPushPullLeg() {
                 placeholder="Efectiu (kg)"
                 className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
                 value={values[ex.id]?.eff || ""}
-                onChange={(e) => handleChange(ex.id, "eff", e.target.value)}
+                onBlur={(e) => handleChange(ex.id, "eff", e.target.value)}
               />
               <input
                 type="number"
@@ -143,7 +139,7 @@ export default function RutinaPushPullLeg() {
                 placeholder="Aprox. (kg)"
                 className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
                 value={values[ex.id]?.warm || ""}
-                onChange={(e) => handleChange(ex.id, "warm", e.target.value)}
+                onBlur={(e) => handleChange(ex.id, "warm", e.target.value)}
               />
             </div>
           </div>
