@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-// RutinaPushPullLeg.jsx
-// Single-file React component (default export) using Tailwind for styling.
+// RutinaPushPullLeg.jsx — versió mobile-first amb Tailwind
+// - Responsive, simple i clara per mòbil
 // - Guarda valors a localStorage
 // - Filtra per PUSH / PULL / LEG
-// - Inputs numèrics per pes efectiu i pes d'aproximació
 
 const STORAGE_PREFIX = "rutina_v1_";
 
@@ -79,209 +78,133 @@ const initialData = {
   ],
 };
 
-function loadSaved(sectionId, field) {
-  const key = STORAGE_PREFIX + sectionId + "_" + field;
-  const raw = localStorage.getItem(key);
-  return raw !== null && raw !== undefined && raw !== "" ? raw : "";
-}
+const getSaved = (id, field) =>
+  localStorage.getItem(STORAGE_PREFIX + id + "_" + field) || "";
+const saveValue = (id, field, val) =>
+  localStorage.setItem(STORAGE_PREFIX + id + "_" + field, val);
+const clearStorage = () =>
+  Object.keys(localStorage).forEach(
+    (k) => k.startsWith(STORAGE_PREFIX) && localStorage.removeItem(k)
+  );
 
-function saveValue(sectionId, field, value) {
-  const key = STORAGE_PREFIX + sectionId + "_" + field;
-  localStorage.setItem(key, value);
-}
-
-function clearAllStorage() {
-  Object.keys(localStorage).forEach((k) => {
-    if (k.startsWith(STORAGE_PREFIX)) localStorage.removeItem(k);
-  });
-}
-
-export default function Rutina() {
+export default function RutinaPushPullLeg() {
   const [filter, setFilter] = useState(
     () => localStorage.getItem(STORAGE_PREFIX + "selected_filter") || "all"
   );
-
-  // state for inputs: { [id]: { eff: "", warm: "" } }
   const [values, setValues] = useState(() => {
-    const obj = {};
-    Object.keys(initialData).forEach((section) => {
-      initialData[section].forEach((ex) => {
-        obj[ex.id] = {
-          eff: loadSaved(ex.id, "eff"),
-          warm: loadSaved(ex.id, "warm"),
+    const all = {};
+    Object.keys(initialData).forEach((sec) => {
+      initialData[sec].forEach((ex) => {
+        all[ex.id] = {
+          eff: getSaved(ex.id, "eff"),
+          warm: getSaved(ex.id, "warm"),
         };
       });
     });
-    return obj;
+    return all;
   });
 
   useEffect(() => {
     localStorage.setItem(STORAGE_PREFIX + "selected_filter", filter);
   }, [filter]);
 
-  // handler for numeric input
   const handleChange = (id, field, val) => {
-    // allow blank or numeric (we keep as string to preserve empty)
-    if (val === "" || /^\d*(?:[.,]\d+)?$/.test(val)) {
-      setValues((prev) => {
-        const copy = { ...prev, [id]: { ...prev[id], [field]: val } };
-        return copy;
-      });
-      saveValue(id, field, val);
-    }
+    setValues((prev) => ({ ...prev, [id]: { ...prev[id], [field]: val } }));
+    saveValue(id, field, val);
   };
 
-  const handleClear = () => {
+  const clearAll = () => {
     if (!confirm("Vols esborrar tots els valors guardats?")) return;
-    clearAllStorage();
-    // reset state to empty strings
+    clearStorage();
     const empty = {};
-    Object.keys(initialData).forEach((section) => {
-      initialData[section].forEach((ex) => {
-        empty[ex.id] = { eff: "", warm: "" };
-      });
+    Object.keys(initialData).forEach((sec) => {
+      initialData[sec].forEach((ex) => (empty[ex.id] = { eff: "", warm: "" }));
     });
     setValues(empty);
     setFilter("all");
   };
 
-  const renderSection = (sectionName) => {
-    const list = initialData[sectionName];
-    return (
-      <div key={sectionName} className="mb-6">
-        <div className="text-blue-300 font-semibold text-lg mb-3">
-          Exercicis {sectionName}
-        </div>
-        <div className="overflow-x-auto bg-slate-800 rounded-lg p-3">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-slate-400 text-sm">
-                <th className="pb-2">Exercici</th>
-                <th className="pb-2">Series / Reps</th>
-                <th className="pb-2 text-right">Pes efectiu (kg)</th>
-                <th className="pb-2 text-right">Pes aproximació (kg)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.map((ex) => (
-                <tr key={ex.id} className="border-t border-slate-700">
-                  <td className="py-3 pr-4 w-1/2">{ex.name}</td>
-                  <td className="py-3 text-slate-400">{ex.series}</td>
-                  <td className="py-3 text-right">
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      className="w-28 text-right bg-slate-900 px-2 py-1 rounded-md border border-slate-700"
-                      value={values[ex.id]?.eff || ""}
-                      onChange={(e) =>
-                        handleChange(
-                          ex.id,
-                          "eff",
-                          e.target.value.replace(",", ".")
-                        )
-                      }
-                      placeholder="kg"
-                    />
-                  </td>
-                  <td className="py-3 text-right">
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      className="w-28 text-right bg-slate-900 px-2 py-1 rounded-md border border-slate-700"
-                      value={values[ex.id]?.warm || ""}
-                      onChange={(e) =>
-                        handleChange(
-                          ex.id,
-                          "warm",
-                          e.target.value.replace(",", ".")
-                        )
-                      }
-                      placeholder="kg"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+  const Section = ({ name }) => (
+    <div className="mb-6">
+      <h2 className="text-blue-400 font-semibold text-lg mb-3 text-center md:text-left">
+        Exercicis {name}
+      </h2>
+      <div className="flex flex-col gap-3">
+        {initialData[name].map((ex) => (
+          <div
+            key={ex.id}
+            className="bg-slate-800 rounded-xl p-3 flex flex-col md:flex-row md:items-center md:justify-between"
+          >
+            <div className="flex flex-col">
+              <span className="font-medium">{ex.name}</span>
+              <span className="text-slate-400 text-sm">{ex.series}</span>
+            </div>
+            <div className="flex gap-2 mt-2 md:mt-0">
+              <input
+                type="number"
+                inputMode="decimal"
+                placeholder="Efectiu (kg)"
+                className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
+                value={values[ex.id]?.eff || ""}
+                onChange={(e) => handleChange(ex.id, "eff", e.target.value)}
+              />
+              <input
+                type="number"
+                inputMode="decimal"
+                placeholder="Aprox. (kg)"
+                className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
+                value={values[ex.id]?.warm || ""}
+                onChange={(e) => handleChange(ex.id, "warm", e.target.value)}
+              />
+            </div>
+          </div>
+        ))}
       </div>
-    );
-  };
+    </div>
+  );
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-slate-900 text-slate-100 rounded-2xl shadow-lg">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-2xl font-semibold">Rutina: PUSH / PULL / LEG</h1>
-          <p className="text-slate-400 text-sm">
-            Introdueix el pes efectiu i el pes d'aproximació per cada exercici.
-            Es guarda automàticament al navegador.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-slate-300">
+    <main className="max-w-2xl mx-auto p-4 bg-slate-900 text-slate-100 min-h-screen">
+      <header className="mb-4 text-center">
+        <h3 className="text-xl font-semibold">Rutina: PUSH / PULL / LEG</h3>
+        <p className="text-slate-400 text-sm">
+          Afegeix el pes efectiu i d'aproximació. Es guarda automàticament.
+        </p>
+      </header>
+
+      <div className="flex flex-wrap justify-center gap-3 mb-6">
+        {["all", "PUSH", "PULL", "LEG"].map((v) => (
+          <label
+            key={v}
+            className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm cursor-pointer ${
+              filter === v ? "bg-blue-600" : "bg-slate-700"
+            }`}
+          >
             <input
               type="radio"
-              name="sel"
-              value="all"
-              checked={filter === "all"}
-              onChange={() => setFilter("all")}
+              name="filter"
+              value={v}
+              checked={filter === v}
+              onChange={() => setFilter(v)}
+              className="hidden"
             />
-            Tots
+            {v.toUpperCase()}
           </label>
-          <label className="flex items-center gap-2 text-amber-300">
-            <input
-              type="radio"
-              name="sel"
-              value="PUSH"
-              checked={filter === "PUSH"}
-              onChange={() => setFilter("PUSH")}
-            />
-            PUSH
-          </label>
-          <label className="flex items-center gap-2 text-emerald-300">
-            <input
-              type="radio"
-              name="sel"
-              value="PULL"
-              checked={filter === "PULL"}
-              onChange={() => setFilter("PULL")}
-            />
-            PULL
-          </label>
-          <label className="flex items-center gap-2 text-violet-300">
-            <input
-              type="radio"
-              name="sel"
-              value="LEG"
-              checked={filter === "LEG"}
-              onChange={() => setFilter("LEG")}
-            />
-            LEG
-          </label>
-        </div>
+        ))}
       </div>
 
-      <div>
-        {(filter === "all" || filter === "PUSH") && renderSection("PUSH")}
-        {(filter === "all" || filter === "PULL") && renderSection("PULL")}
-        {(filter === "all" || filter === "LEG") && renderSection("LEG")}
-      </div>
+      {(filter === "all" || filter === "PUSH") && <Section name="PUSH" />}
+      {(filter === "all" || filter === "PULL") && <Section name="PULL" />}
+      {(filter === "all" || filter === "LEG") && <Section name="LEG" />}
 
-      <div className="flex items-center justify-end gap-3 mt-4">
+      <footer className="mt-6 flex justify-center">
         <button
-          className="px-4 py-2 rounded-md border border-slate-700 text-slate-300"
-          onClick={handleClear}
+          onClick={clearAll}
+          className="px-4 py-2 bg-slate-700 hover:bg-red-600 rounded-lg text-sm font-medium"
         >
           Esborrar valors
         </button>
-        <button
-          className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 font-semibold"
-          onClick={() => alert("Els valors ja es guarden automàticament.")}
-        >
-          Desar ara
-        </button>
-      </div>
-    </div>
+      </footer>
+    </main>
   );
 }
