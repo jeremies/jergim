@@ -89,7 +89,7 @@ const clearStorage = () =>
 
 export default function RutinaPushPullLeg() {
   const [filter, setFilter] = useState(
-    () => localStorage.getItem(STORAGE_PREFIX + "selected_filter") || "push"
+    () => localStorage.getItem(STORAGE_PREFIX + "selected_filter") || "PUSH"
   );
   const [values, setValues] = useState(() => {
     const all = {};
