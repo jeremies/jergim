@@ -83,31 +83,34 @@ const getSaved = (id, field) =>
 const saveValue = (id, field, val) =>
   localStorage.setItem(STORAGE_PREFIX + id + "_" + field, val);
 
+const InputField = ({ id, field, placeholder, initialValue }) => {
+  const [value, setValue] = useState(() => getSaved(id, field) || initialValue);
+
+  const handleChange = (val) => {
+    setValue(val);
+    saveValue(id, field, val);
+  };
+
+  return (
+    <input
+      type="number"
+      inputMode="decimal"
+      placeholder={placeholder}
+      className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
+      value={value}
+      onChange={(e) => handleChange(e.target.value)}
+    />
+  );
+};
+
 export default function RutinaPushPullLeg() {
   const [filter, setFilter] = useState(
     () => localStorage.getItem(STORAGE_PREFIX + "selected_filter") || "PUSH"
   );
-  const [values, setValues] = useState(() => {
-    const all = {};
-    Object.keys(initialData).forEach((sec) => {
-      initialData[sec].forEach((ex) => {
-        all[ex.id] = {
-          eff: getSaved(ex.id, "eff"),
-          warm: getSaved(ex.id, "warm"),
-        };
-      });
-    });
-    return all;
-  });
 
   useEffect(() => {
     localStorage.setItem(STORAGE_PREFIX + "selected_filter", filter);
   }, [filter]);
-
-  const handleChange = (id, field, val) => {
-    setValues((prev) => ({ ...prev, [id]: { ...prev[id], [field]: val } }));
-    saveValue(id, field, val);
-  };
 
   const Section = ({ name }) => (
     <div className="mb-6">
@@ -125,21 +128,17 @@ export default function RutinaPushPullLeg() {
               <span className="text-slate-400 text-sm">{ex.series}</span>
             </div>
             <div className="flex gap-2 mt-2 md:mt-0">
-              <input
-                type="number"
-                inputMode="decimal"
+              <InputField
+                id={ex.id}
+                field="eff"
                 placeholder="Efectiu (kg)"
-                className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
-                value={values[ex.id]?.eff || ""}
-                onChange={(e) => handleChange(ex.id, "eff", e.target.value)}
+                initialValue=""
               />
-              <input
-                type="number"
-                inputMode="decimal"
+              <InputField
+                id={ex.id}
+                field="warm"
                 placeholder="Aprox. (kg)"
-                className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
-                value={values[ex.id]?.warm || ""}
-                onChange={(e) => handleChange(ex.id, "warm", e.target.value)}
+                initialValue=""
               />
             </div>
           </div>
