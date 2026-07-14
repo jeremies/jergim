@@ -207,7 +207,18 @@ export default function RutinaPushPullLeg() {
               name="filter"
               value={v}
               checked={filter === v}
-              onChange={() => setFilter(v)}
+              onChange={() => {
+                setFilter(v);
+                const todayStr = new Date().toISOString().split("T")[0];
+                const logsStr = localStorage.getItem(STORAGE_PREFIX + "workout_logs");
+                let logs = logsStr ? JSON.parse(logsStr) : [];
+                const exists = logs.some(log => log.date === todayStr && log.type === v);
+                if (!exists) {
+                  logs.push({ date: todayStr, type: v });
+                  localStorage.setItem(STORAGE_PREFIX + "workout_logs", JSON.stringify(logs));
+                  window.dispatchEvent(new Event("rutina_workout_logged"));
+                }
+              }}
               className="hidden"
             />
             {v.toUpperCase()}

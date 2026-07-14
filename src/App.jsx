@@ -3,6 +3,7 @@ import PWABadge from "./PWABadge.jsx";
 import "./App.css";
 import Rutina from "./Rutina.jsx";
 import LogView from "./LogView.jsx";
+import Calendari from "./Calendari.jsx";
 
 function App() {
   const [currentView, setCurrentView] = useState("rutina");
@@ -26,6 +27,14 @@ function App() {
             Rutina
           </button>
           <button
+            onClick={() => setCurrentView("calendari")}
+            className={`text-sm font-medium transition-colors cursor-pointer ${
+              currentView === "calendari" ? "text-blue-400 font-semibold" : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Calendari
+          </button>
+          <button
             onClick={() => setCurrentView("log")}
             className={`text-sm font-medium transition-colors cursor-pointer ${
               currentView === "log" ? "text-blue-400 font-semibold" : "text-slate-400 hover:text-slate-200"
@@ -47,6 +56,7 @@ function App() {
       {/* Main Content Area */}
       <div className="flex-1">
         {currentView === "rutina" && <Rutina />}
+        {currentView === "calendari" && <Calendari />}
         {currentView === "log" && <LogView />}
         {currentView === "historial" && (
           <div className="max-w-2xl mx-auto p-8 text-center text-slate-400">
