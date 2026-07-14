@@ -4,6 +4,7 @@ import "./App.css";
 import Rutina from "./Rutina.jsx";
 import LogView from "./LogView.jsx";
 import Calendari from "./Calendari.jsx";
+import SyncDB from "./SyncDB.jsx";
 
 function App() {
   const [currentView, setCurrentView] = useState("rutina");
@@ -43,12 +44,12 @@ function App() {
             Log
           </button>
           <button
-            onClick={() => setCurrentView("historial")}
+            onClick={() => setCurrentView("sync")}
             className={`text-sm font-medium transition-colors cursor-pointer ${
-              currentView === "historial" ? "text-blue-400 font-semibold" : "text-slate-400 hover:text-slate-200"
+              currentView === "sync" ? "text-blue-400 font-semibold" : "text-slate-400 hover:text-slate-200"
             }`}
           >
-            Historial
+            Sync
           </button>
         </div>
       </nav>
@@ -58,12 +59,7 @@ function App() {
         {currentView === "rutina" && <Rutina />}
         {currentView === "calendari" && <Calendari />}
         {currentView === "log" && <LogView />}
-        {currentView === "historial" && (
-          <div className="max-w-2xl mx-auto p-8 text-center text-slate-400">
-            <h2 className="text-2xl font-bold text-slate-200 mb-2">Historial d&apos;Entrenaments</h2>
-            <p>Aquesta secció s&apos;implementarà properament.</p>
-          </div>
-        )}
+        {currentView === "sync" && <SyncDB />}
       </div>
 
       <PWABadge />
