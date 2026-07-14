@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 
 const STORAGE_PREFIX = "rutina_v1_";
 
-const initialData = {
+export const initialData = {
   PUSH: [
     {
       id: "push-press-pla-maquina",
@@ -78,10 +78,48 @@ const initialData = {
   ],
 };
 
+export const getExerciseName = (id) => {
+  for (const category of Object.keys(initialData)) {
+    const found = initialData[category].find((ex) => ex.id === id);
+    if (found) return found.name;
+  }
+  return id;
+};
+
 const getSaved = (id, field) =>
   localStorage.getItem(STORAGE_PREFIX + id + "_" + field) || "";
-const saveValue = (id, field, val) =>
+
+const saveValue = (id, field, val) => {
   localStorage.setItem(STORAGE_PREFIX + id + "_" + field, val);
+
+  // Create a log entry
+  const timestamp = new Date().toISOString();
+  const logEntry = {
+    id: `${timestamp}-${id}-${field}`,
+    timestamp,
+    exerciseId: id,
+    exerciseName: getExerciseName(id),
+    field: field === "eff" ? "Efectiu" : "Aproximació",
+    value: val,
+  };
+
+  // Read existing logs
+  const existingLogsStr = localStorage.getItem(STORAGE_PREFIX + "change_logs");
+  const existingLogs = existingLogsStr ? JSON.parse(existingLogsStr) : [];
+  
+  // Add new log to the top
+  existingLogs.unshift(logEntry);
+
+  // Keep only the last 500 entries
+  if (existingLogs.length > 500) {
+    existingLogs.pop();
+  }
+
+  localStorage.setItem(STORAGE_PREFIX + "change_logs", JSON.stringify(existingLogs));
+
+  // Dispatch a custom event so other views can react immediately
+  window.dispatchEvent(new Event("rutina_log_updated"));
+};
 
 const InputField = ({ id, field, placeholder, initialValue }) => {
   const [value, setValue] = useState(() => getSaved(id, field) || initialValue);

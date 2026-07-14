@@ -2,6 +2,7 @@ import { useState } from "react";
 import PWABadge from "./PWABadge.jsx";
 import "./App.css";
 import Rutina from "./Rutina.jsx";
+import LogView from "./LogView.jsx";
 
 function App() {
   const [currentView, setCurrentView] = useState("rutina");
@@ -25,6 +26,14 @@ function App() {
             Rutina
           </button>
           <button
+            onClick={() => setCurrentView("log")}
+            className={`text-sm font-medium transition-colors cursor-pointer ${
+              currentView === "log" ? "text-blue-400 font-semibold" : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Log
+          </button>
+          <button
             onClick={() => setCurrentView("historial")}
             className={`text-sm font-medium transition-colors cursor-pointer ${
               currentView === "historial" ? "text-blue-400 font-semibold" : "text-slate-400 hover:text-slate-200"
@@ -37,9 +46,9 @@ function App() {
 
       {/* Main Content Area */}
       <div className="flex-1">
-        {currentView === "rutina" ? (
-          <Rutina />
-        ) : (
+        {currentView === "rutina" && <Rutina />}
+        {currentView === "log" && <LogView />}
+        {currentView === "historial" && (
           <div className="max-w-2xl mx-auto p-8 text-center text-slate-400">
             <h2 className="text-2xl font-bold text-slate-200 mb-2">Historial d&apos;Entrenaments</h2>
             <p>Aquesta secció s&apos;implementarà properament.</p>
