@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 // RutinaPushPullLeg.jsx — versió mobile-first amb Tailwind
 // - Responsive, simple i clara per mòbil
@@ -91,8 +91,9 @@ const getSaved = (id, field) =>
 
 const saveValue = (id, field, val) => {
   localStorage.setItem(STORAGE_PREFIX + id + "_" + field, val);
+};
 
-  // Create a log entry
+const logValue = (id, field, val) => {
   const timestamp = new Date().toISOString();
   const logEntry = {
     id: `${timestamp}-${id}-${field}`,
@@ -123,10 +124,21 @@ const saveValue = (id, field, val) => {
 
 const InputField = ({ id, field, placeholder, initialValue }) => {
   const [value, setValue] = useState(() => getSaved(id, field) || initialValue);
+  const valueAtFocus = useRef(value);
 
   const handleChange = (val) => {
     setValue(val);
     saveValue(id, field, val);
+  };
+
+  const handleFocus = () => {
+    valueAtFocus.current = value;
+  };
+
+  const handleBlur = () => {
+    if (value !== valueAtFocus.current) {
+      logValue(id, field, value);
+    }
   };
 
   return (
@@ -137,6 +149,8 @@ const InputField = ({ id, field, placeholder, initialValue }) => {
       className="w-28 bg-slate-900 border border-slate-700 rounded-lg p-2 text-right text-sm"
       value={value}
       onChange={(e) => handleChange(e.target.value)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     />
   );
 };
